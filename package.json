@@ -1,0 +1,27 @@
+{
+	"name": "omp-pstack",
+	"version": "1.0.0",
+	"description": "pstack for omp: Lauren Tan's poteto-mode and the full pstack skill set, ported to oh-my-pi.",
+	"private": true,
+	"license": "MIT",
+	"keywords": [
+		"omp",
+		"oh-my-pi",
+		"pstack",
+		"poteto-mode",
+		"skills",
+		"agents",
+		"workflow"
+	],
+	"omp": {
+		"name": "pstack",
+		"description": "pstack for omp - rigorous workflows",
+		"skills": "./plugins/pstack/skills",
+		"agents": "./plugins/pstack/agents",
+		"rules": "./plugins/pstack/rules"
+	},
+	"pi": {
+		"name": "pstack",
+		"skills": "./plugins/pstack/skills"
+	}
+}

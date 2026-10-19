@@ -1,0 +1,34 @@
+{
+	"name": "omp-pstack",
+	"owner": {
+		"name": "nhathoang"
+	},
+	"metadata": {
+		"description": "omp-pstack: Lauren Tan's pstack ported to omp (Oh My Pi). poteto-mode plus the full skill set, translated for the omp harness only.",
+		"version": "1.0.0"
+	},
+	"plugins": [
+		{
+			"name": "pstack",
+			"source": "./plugins/pstack",
+			"description": "if you want to go fast, go deep first. pstack helps you write less, but higher quality code. rigorous agent workflows you can parallelize with confidence.",
+			"version": "1.0.0",
+			"author": {
+				"name": "Lauren Tan (original)"
+			},
+			"homepage": "https://github.com/cursor/plugins/tree/main/pstack",
+			"repository": "https://github.com/cursor/plugins",
+			"license": "MIT",
+			"category": "development",
+			"keywords": [
+				"pstack",
+				"poteto-mode",
+				"workflow",
+				"principles",
+				"agent-style",
+				"subagents",
+				"unslop"
+			]
+		}
+	]
+}

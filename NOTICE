@@ -1,0 +1,27 @@
+pstack (omp port)
+Copyright (c) 2026 nhathoang (omp port)
+
+This distribution is a harness port of pstack:
+  https://github.com/cursor/plugins/tree/main/pstack
+  Copyright (c) 2026 Lauren Tan
+  Licensed under the MIT License.
+
+The skills, playbooks, principles, agent prompts, and script bodies in
+plugins/pstack/ are derived from pstack. They keep Lauren Tan's workflow logic
+and are reproduced under the MIT License in LICENSE. Harness-specific prose was
+translated for omp (Oh My Pi).
+
+Files that are new in the port and carry no upstream derivation:
+  plugins/pstack/skills/pstack-omp/
+  plugins/pstack/skills/omp-mechanics/
+  plugins/pstack/skills/setup-pstack/  (rewritten for omp; upstream structure kept)
+  plugins/pstack/agents/*.md           (seven agents promoted from upstream prompt templates)
+  plugins/pstack/extension/
+  plugins/pstack/commands/
+  plugins/pstack/rules/pstack-session-mandate.md
+  scripts/
+  docs/
+
+The upstream-external tools that pstack's workflows call out, such as Graphite
+(gt), GitHub's CLI, Bugbot, and control skills from cursor-team-kit, remain the
+property of their authors and are not redistributed here.

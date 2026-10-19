@@ -1,0 +1,19 @@
+{
+	"name": "pstack",
+	"version": "1.0.0",
+	"description": "if you want to go fast, go deep first. pstack helps you write less, but higher quality code. rigorous agent workflows you can parallelize with confidence.",
+	"private": true,
+	"license": "MIT",
+	"omp": {
+		"name": "pstack",
+		"description": "pstack for omp - rigorous workflows",
+		"skills": "./skills",
+		"agents": "./agents",
+		"rules": "./rules",
+		"extensions": ["./extension/index.js"]
+	},
+	"pi": {
+		"name": "pstack",
+		"skills": "./skills"
+	}
+}
