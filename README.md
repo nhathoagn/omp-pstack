@@ -21,28 +21,78 @@ from a local checkout:
 omp plugin install ./plugins/pstack --local
 ```
 
-## get started
+## hướng dẫn sử dụng
 
-two steps:
+làm một lần sau khi cài, rồi gọi skill. mở **session omp mới** sau khi cài hoặc sau khi đổi lane; session đang mở không thấy plugin vừa cài.
 
-1. run [`/skill:setup-pstack`](./plugins/pstack/skills/setup-pstack/SKILL.md) and choose which models fill the ten lanes.
-2. use [`/skill:poteto-mode`](./plugins/pstack/skills/poteto-mode/SKILL.md) whenever you're doing anything that requires rigor.
+### 1. chọn model cho từng vai
 
-the mode skill reads your request, picks from a set of playbooks, and runs the other skills as the steps need them. out of the box it splits work by model strength: precisely-specified code goes to sol, fast mechanical code goes to grok, prose and judgment go to fable, and the review panel is fable / sol / grok / opus 5. setup changes any of it.
+pstack không dùng một model cho mọi việc. mỗi vai (code, review, design, …) là một **lane**. lane chưa cấu hình thì spawn **fail** với `No model selected`, không tự rơi xuống model yếu hơn.
 
-## usage
-
-bare-name commands ship with the plugin as `/pstack:<name>`, so `/pstack:how` and `/skill:how` both work, as do `/pstack:poteto-mode`, `/pstack:why`, `/pstack:architect`, `/pstack:interrogate`, `/pstack:arena`, `/pstack:reflect`, `/pstack:setup-pstack`.
+trong một session omp:
 
 ```
-/poteto-mode this pr has a subtle bug where the scroll drifts every 750ms even when idle. repro
-first, then fix and verify.
+/skill:setup-pstack
+```
+
+skill hỏi model nào đi lane nào, rồi ghi vào `~/.omp/agent/config.yml` (`modelRoles`). chỉ chọn selector mà `omp models` liệt kê được. `*` nghĩa là "dùng model mặc định của mình". `inherit` không phải giá trị lane.
+
+muốn xem đang trỏ đâu:
+
+```shell
+omp config get modelRoles
+```
+
+### 2. gọi đúng cú pháp
+
+omp **không** có lệnh trần `/poteto-mode` hay `/how`. hai cách đều chạy:
+
+| cách | khi nào |
+|---|---|
+| `/skill:<tên> <việc>` | mọi skill, kể cả skill không có command |
+| `/pstack:<tên> <việc>` | 8 command có sẵn: `poteto-mode`, `how`, `why`, `architect`, `interrogate`, `arena`, `reflect`, `setup-pstack` |
+
+```
+/skill:poteto-mode Bug: filterByTag so khớp tag phân biệt hoa thường. src/filters.test.ts đã reproduce. sửa và chạy bun test đến khi xanh.
 ```
 
 ```
-/poteto-mode i'm going to bed. land the stack even if ci flakes. i want everything merged by
-morning.
+/pstack:how luồng hủy run đi qua đâu? có n+1 khi tra từng run không?
 ```
+
+### 3. việc hàng ngày
+
+cổng mặc định là [`/skill:poteto-mode`](./plugins/pstack/skills/poteto-mode/SKILL.md). nó đọc yêu cầu, chọn **một** playbook, rồi tự gọi skill khác khi bước đó cần. không cần nhớ 23 playbook.
+
+| bạn muốn | gõ |
+|---|---|
+| làm một việc có rigor (feature, bug, refactor) | `/skill:poteto-mode <mô tả + cách verify>` |
+| hỏi một subsystem hoạt động thế nào | `/skill:how <câu hỏi>` |
+| hỏi vì sao code thành ra thế | `/skill:why <câu hỏi>` |
+| chốt shape trước khi viết code vượt một hàm | `/skill:architect <thay đổi>` |
+| vài model cố phá một diff | `/skill:interrogate review diff này` |
+| vài phương án song song, rồi lấy phần tốt | `/skill:arena <bài toán>` |
+| sau một task dài, ghi lại recipe | `/skill:reflect` |
+| đổi model từng vai | `/skill:setup-pstack` |
+
+việc càng cụ thể càng ít vòng thừa. nói rõ file, lệnh verify (`bun test`, `npm test`), và "đừng dừng để hỏi" nếu bạn muốn nó chạy đến hết.
+
+khi poteto-mode đã bật, status line hiện `pstack: poteto-mode`. không có dòng đó thì skill chưa được kích hoạt trong session này.
+
+### 4. chuyện gì xảy ra sau lệnh
+
+`poteto-mode` không nhảy thẳng vào sửa file. tùy playbook nó có thể đọc `how` / `why`, rồi `architect` hoặc `arena` (vài agent song song, mỗi arm một lane), rồi mới giao code cho `poteto-agent`. feature và arena nặng; bug có test fail sẵn thì đi playbook `bug-fix`, ngắn hơn.
+
+lane tới một spawn theo thứ tự: tag `lane: @pstack-x` trong brief, rồi thứ tự panel nếu một batch có nhiều arm (`review-a` … `review-d`), không thì lane khai trong agent. chi tiết ở [docs/omp.md](./docs/omp.md).
+
+### 5. khi lỗi
+
+| thấy | làm |
+|---|---|
+| `No model selected` | lane trống hoặc selector không spawn được. chạy lại `/skill:setup-pstack`. |
+| gõ `/poteto-mode` không ra gì | dùng `/skill:poteto-mode` hoặc `/pstack:poteto-mode`. |
+| `omp plugin doctor` crash | lỗi của omp 18.12.1, mọi plugin đều crash. kiểm tra bằng `omp plugin list` và `omp read skill://poteto-mode`. |
+| status line không hiện | session mở trước khi cài, hoặc chưa gọi poteto-mode. mở session mới. |
 
 <details>
 <summary>the twenty-three playbooks</summary>
@@ -77,11 +127,11 @@ morning.
 
 ### skills
 
-`poteto-mode` runs most of these for you when a step needs them. the table is for when you want one directly (`/pstack:how` or `/skill:how`):
+`poteto-mode` runs most of these for you when a step needs them. the table is for when you want one directly. same rule as above: `/skill:how` or `/pstack:how`, never a bare `/how`.
 
 ```
-/how do we cancel runs? do we have an n+1 when we look up every run to cancel?
-/interrogate review this pr.
+/skill:how do we cancel runs? do we have an n+1 when we look up every run to cancel?
+/skill:interrogate review this pr.
 ```
 
 <details>
