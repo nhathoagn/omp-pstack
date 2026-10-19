@@ -11,7 +11,7 @@ this repository is **omp-pstack**: lauren's pstack ported to [omp (Oh My Pi)](ht
 ## install
 
 ```shell
-omp plugin marketplace add <owner>/omp-pstack
+omp plugin marketplace add nhathoagn/omp-pstack
 omp plugin install pstack@omp-pstack
 ```
 
